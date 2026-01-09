@@ -1,36 +1,59 @@
 <script setup>
-defineProps({
-  recipe: {
-    type: Object,
-    required: true
-  }
+defineProps({ 
+  recipe: { type: Object, required: true } 
 })
 </script>
 
 <template>
-  <div style="border: 1px solid black; margin: 20px; padding: 10px;">
-    <h2>{{ recipe.title }}</h2>
-    <p><i>{{ recipe.description }}</i></p>
+  <v-card 
+    link 
+    elevation="1" 
+    class="mb-3 pa-2"  
+    @click="$emit('click')"
+  >
+    
+    <v-row align="center" no-gutters>
 
-    <p><strong>Dificultate:</strong> {{ recipe.details?.difficulty }}</p>
-    <p><strong>Timp Total:</strong> {{ (recipe.details?.time?.prep || 0) + (recipe.details?.time?.cook || 0) }} minute</p>
+      <v-col cols="12" md="5">
+        <div class="d-flex align-center pl-2">
+          <v-avatar color="purple-lighten-5" size="50" class="mr-4">
+            <v-icon color="purple-darken-2" icon="mdi-silverware-fork-knife"></v-icon>
+          </v-avatar>
+          <h3 class="text-h6 font-weight-bold">{{ recipe.title }}</h3>
+        </div>
+      </v-col>
 
-    <hr>
+      <v-col cols="12" md="4" class="py-2">
+        <v-chip 
+          prepend-icon="mdi-chef-hat"
+          :color="recipe.details?.difficulty === 'Ușor' ? 'green' : 'orange'" 
+          variant="tonal"
+          class="mr-2 font-weight-bold"
+        >
+          {{ recipe.details?.difficulty }}
+        </v-chip>
 
-    <h3>Ingrediente:</h3>
-    <ul>
-      <li v-for="(ing, index) in recipe.ingredients" :key="index">
-        {{ ing.quantity }} - {{ ing.name }}
-      </li>
-    </ul>
+        <v-chip 
+          prepend-icon="mdi-clock-outline"
+          color="blue-grey" 
+          variant="tonal"
+          class="font-weight-bold"
+        >
+          {{ (recipe.details?.time?.prep || 0) + (recipe.details?.time?.cook || 0) }} min
+        </v-chip>
+      </v-col>
 
-    <h3>Mod de preparare:</h3>
-    <ol>
-      <li v-for="(step, index) in recipe.steps" :key="index">
-        {{ step.instruction }}
-      </li>
-    </ol>
+      <v-col cols="12" md="3" class="text-right pr-2">
+        <v-btn 
+          color="purple-lighten-4" 
+          variant="flat" 
+          class="text-purple-darken-2 font-weight-bold"
+          append-icon="mdi-arrow-right"
+        >
+          Vezi Detalii
+        </v-btn>
+      </v-col>
 
-    <small>ID: {{ recipe.id }} | User: {{ recipe.userId }}</small>
-  </div>
+    </v-row>
+  </v-card>
 </template>

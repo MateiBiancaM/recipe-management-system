@@ -3,6 +3,7 @@ import { ref } from 'vue'
 
 export const useRecipeStore = defineStore('recipes', () => {
   const recipes = ref([])
+  const currentRecipe = ref(null)
   const loading = ref(false)
   const error = ref(null)
 
@@ -26,5 +27,19 @@ export const useRecipeStore = defineStore('recipes', () => {
     }
   }
 
-  return { recipes, loading, error, fetchRecipes }
+  async function fetchRecipeById(id) {
+    loading.value = true
+    currentRecipe.value = null // resetam inainte sa incarcam
+    try {
+      const res = await fetch(`http://localhost:8080/recipes/${id}`)
+      if (!res.ok) throw new Error('Nu am găsit rețeta')
+      currentRecipe.value = await res.json()
+    } catch (err) {
+      error.value = err.message
+    } finally {
+      loading.value = false
+    }
+  }
+
+  return { recipes, loading, error, fetchRecipes, currentRecipe, fetchRecipeById }
 })
