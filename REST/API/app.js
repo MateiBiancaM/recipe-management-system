@@ -1,6 +1,7 @@
 const express = require('express'); 
 const cors = require('cors'); 
 require('dotenv').config();
+const db = require('./db');
 
 const app = express(); 
 const PORT = process.env.PORT || 8080; 
@@ -25,9 +26,23 @@ let recipes = [
 app.use(cors()); 
 app.use(express.json()); 
 
-app.get('/recipes', (req, res) => {
-    res.status(200).json(recipes) 
-})
+const recipesCollection = db.collection('recipes');
+
+app.get('/recipes', async (req, res) => {
+    try {
+        const snapshot = await recipesCollection.get();
+        const list = [];
+        snapshot.forEach(doc => {
+            list.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+        res.status(200).json(list);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`)
