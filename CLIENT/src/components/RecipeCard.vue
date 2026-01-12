@@ -1,4 +1,5 @@
 <script setup>
+import { formatTotalTime, getDifficultyColor } from '@/utils/formatters';
 defineProps({ 
   recipe: { type: Object, required: true } 
 })
@@ -26,7 +27,7 @@ defineProps({
       <v-col cols="12" md="4" class="py-2">
         <v-chip 
           prepend-icon="mdi-chef-hat"
-          :color="recipe.details?.difficulty === 'Ușor' ? 'green' : 'orange'" 
+          :color="getDifficultyColor(recipe.details?.difficulty)" 
           variant="tonal"
           class="mr-2 font-weight-bold"
         >
@@ -39,7 +40,7 @@ defineProps({
           variant="tonal"
           class="font-weight-bold"
         >
-          {{ (recipe.details?.time?.prep || 0) + (recipe.details?.time?.cook || 0) }} min
+          {{ formatTotalTime(recipe.details?.time?.prep, recipe.details?.time?.cook) }}
         </v-chip>
       </v-col>
 

@@ -1,4 +1,5 @@
 <script setup>
+import { formatTotalTime } from '@/utils/formatters';
 defineProps({
   recipe: Object,
   modelValue: Boolean
@@ -22,12 +23,12 @@ defineEmits(['update:modelValue'])
       <v-card-text>
         
         <div class="text-center pa-4 bg-grey-lighten-3">
-          <h1 class="text-h4 font-weight-bold">{{ recipe.title }}</h1>
+          <h1 class="text-h4 font-weight-bold text-purple-darken-2">{{ recipe.title }}</h1>
           <p class="font-italic text-grey my-2">{{ recipe.description }}</p>
 
           <div class="d-flex justify-center gap-2 mt-2">
             <v-chip prepend-icon="mdi-chef-hat">{{ recipe.details?.difficulty }}</v-chip>
-            <v-chip prepend-icon="mdi-clock-outline">{{ (recipe.details?.time?.prep || 0) + (recipe.details?.time?.cook || 0) }} min</v-chip>
+            <v-chip prepend-icon="mdi-clock-outline">{{ formatTotalTime(recipe.details?.time?.prep, recipe.details?.time?.cook) }}</v-chip>
             <v-chip prepend-icon="mdi-account">{{ recipe.details?.servings }} porții</v-chip>
           </div>
         </div>
@@ -35,7 +36,10 @@ defineEmits(['update:modelValue'])
         <v-divider></v-divider>
 
         <v-list lines="one">
-          <v-list-subheader>INGREDIENTE</v-list-subheader>
+          <v-list-subheader class="text-purple-darken-2 font-weight-black d-flex align-center text py-2">
+            <v-icon icon="mdi-basket" class="mr-2"></v-icon>
+            INGREDIENTE
+          </v-list-subheader>
           
           <v-list-item 
             v-for="(ing, i) in recipe.ingredients" 
@@ -51,8 +55,10 @@ defineEmits(['update:modelValue'])
         <v-divider></v-divider>
 
         <v-list lines="two">
-          <v-list-subheader>MOD DE PREPARARE</v-list-subheader>
-
+          <v-list-subheader class="text-purple-darken-2 font-weight-black d-flex align-center text py-2">
+            <v-icon icon="mdi-pot-steam" class="mr-2"></v-icon>
+            MOD DE PREPARARE
+          </v-list-subheader>
           <v-list-item 
             v-for="(step, i) in recipe.steps" 
             :key="i"
@@ -68,6 +74,13 @@ defineEmits(['update:modelValue'])
             </v-list-item-title>
           </v-list-item>
         </v-list>
+
+       <div class="text-center py-6">
+          <v-icon icon="mdi-silverware-variant" color="purple-darken-2" size="30" class="mb-2"></v-icon>
+          <h2 class="text-h5 font-weight-bold text-purple-darken-2" style="font-family: cursive !important;">
+            Poftă bună!
+          </h2>
+        </div>
 
       </v-card-text>
     </v-card>
