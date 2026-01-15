@@ -1,4 +1,4 @@
-const db = require('../db'); 
+const { db } = require('../db'); 
 const recipesCollection = db.collection('recipes');
 
 //get all

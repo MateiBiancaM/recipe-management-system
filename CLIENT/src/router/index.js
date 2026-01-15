@@ -2,6 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import RecipesView from '../views/RecipesView.vue'
 import LoginView from '../views/LoginView.vue'
+import MyRecipesView from '../views/MyRecipesView.vue'
+import { auth } from '@/firebase'
+import { onAuthStateChanged } from 'firebase/auth'
 
 
 const router = createRouter({
@@ -20,9 +23,45 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: LoginView
+      component: LoginView,
+      meta: { guestOnly: true }
     },
+    {
+      path: '/my-recipes',
+      name: 'my-recipes',
+      component: MyRecipesView,
+      meta: { requiresAuth: true }
+    }
   ]
 })
+
+const getCurrentUser = () => {
+  return new Promise((resolve, reject) => {
+    const removeListener = onAuthStateChanged(
+      auth,
+      (user) => {
+        removeListener(); 
+        resolve(user);
+      },
+      reject
+    );
+  });
+};
+
+router.beforeEach(async (to, from, next) => {
+  const currentUser = await getCurrentUser();
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const isGuestOnly = to.matched.some(record => record.meta.guestOnly);
+
+  if (requiresAuth && !currentUser) {
+    next('/login');
+  } 
+  else if (isGuestOnly && currentUser) {
+    next('/my-recipes');
+  } 
+  else {
+    next();
+  }
+});
 
 export default router

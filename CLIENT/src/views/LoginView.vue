@@ -1,4 +1,20 @@
 <script setup>
+import { useUserStore } from '@/stores/user'
+import { ref } from 'vue';
+
+const userStore = useUserStore()
+const isLoading = ref(false)
+
+const handleGoogleLogin = async () => {
+  isLoading.value = true
+  try {
+    await userStore.loginGoogle()
+  } catch (error) {
+    console.error("Eroare la login:", error)
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
 
 <template>
@@ -17,7 +33,9 @@
         color="white"
         class="text-none font-weight-bold"
         prepend-icon="mdi-google"
-        @click=""
+        @click="handleGoogleLogin()"
+        :loading="isLoading" 
+        :disabled="isLoading"
       >
         Conectează-te cu Google
       </v-btn>
