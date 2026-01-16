@@ -3,6 +3,8 @@ import HomeView from '../views/HomeView.vue'
 import RecipesView from '../views/RecipesView.vue'
 import LoginView from '../views/LoginView.vue'
 import MyRecipesView from '../views/MyRecipesView.vue'
+import AddRecipeView from '@/views/AddRecipeView.vue'
+import EditRecipeView from '../views/EditRecipeView.vue'
 import { auth } from '@/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 
@@ -30,6 +32,18 @@ const router = createRouter({
       path: '/my-recipes',
       name: 'my-recipes',
       component: MyRecipesView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/add-recipe',
+      name: 'add-recipe',
+      component: AddRecipeView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/edit-recipe/:id',
+      name: 'edit-recipe',
+      component: EditRecipeView,
       meta: { requiresAuth: true }
     }
   ]

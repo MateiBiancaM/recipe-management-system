@@ -1,11 +1,13 @@
 <script setup>
   import { useUserStore } from './stores/user';
+  import { useSnackbarStore } from '@/stores/snackbar';
   import { onMounted } from 'vue';
   import { auth } from './firebase';
   import { onAuthStateChanged } from 'firebase/auth';
 
   const userStore = useUserStore();
-  
+  const snackbarStore = useSnackbarStore();
+
   const menuItems = [
     { title: 'Acasă',   to: '/',           icon: 'mdi-home' },
     { title: 'Rețete',  to: '/recipes',    icon: 'mdi-book-open-variant' },
@@ -104,5 +106,18 @@
         <RouterView />
       </v-container>
     </v-main>
+    <v-snackbar
+      v-model="snackbarStore.show"
+      :color="snackbarStore.color"
+      timeout="3000"
+      location="bottom right"
+    >
+      {{ snackbarStore.text }}
+      <template v-slot:actions>
+        <v-btn variant="text" @click="snackbarStore.show = false">
+          Închide
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-app>
 </template>

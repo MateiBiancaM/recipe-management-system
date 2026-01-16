@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useUserStore } from './user'
 
 export const useRecipeStore = defineStore('recipes', () => {
   const recipes = ref([])
@@ -7,18 +8,23 @@ export const useRecipeStore = defineStore('recipes', () => {
   const loading = ref(false)
   const error = ref(null)
 
-  // legatura cu backend-ul
-  async function fetchRecipes() {
+  const userStore = useUserStore();
+  const API_URL = `${import.meta.env.VITE_API_URL}/recipes`
+
+  async function getAllRecipes() {
     loading.value = true
     error.value = null
-    
+
     try {
-      const response = await fetch('http://localhost:8080/recipes')
-      
-      if (!response.ok) throw new Error('Nu am putut conecta la server!')
-      const data = await response.json() // salveaza datele primite
-      recipes.value = data
-      
+      const response = await fetch(API_URL, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      if (!response.ok) throw new Error('Nu am putut încărca lista de rețete!')
+      const data = await response.json()
+      recipes.value = data 
     } catch (err) {
       console.error(err)
       error.value = err.message
@@ -27,11 +33,36 @@ export const useRecipeStore = defineStore('recipes', () => {
     }
   }
 
+  async function getMyRecipes() {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const response = await fetch(`${API_URL}/my-recipes`, { 
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${userStore.token}` 
+        }
+      })
+      if (!response.ok) throw new Error('Nu am putut încărca rețetele tale!')
+      const data = await response.json()
+      recipes.value = data 
+    } catch (err) {
+      console.error(err)
+      error.value = err.message
+    } finally {
+      loading.value = false
+    }
+  }
   async function fetchRecipeById(id) {
     loading.value = true
-    currentRecipe.value = null // resetam inainte sa incarcam
+    currentRecipe.value = null
     try {
-      const res = await fetch(`http://localhost:8080/recipes/${id}`)
+      const res = await fetch(`${API_URL}/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${userStore.token}`
+        }
+      })
       if (!res.ok) throw new Error('Nu am găsit rețeta')
       currentRecipe.value = await res.json()
     } catch (err) {
@@ -41,5 +72,85 @@ export const useRecipeStore = defineStore('recipes', () => {
     }
   }
 
-  return { recipes, loading, error, fetchRecipes, currentRecipe, fetchRecipeById }
+  async function addRecipe(newRecipe) {
+    loading.value = true
+
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userStore.token}`
+        },
+        body: JSON.stringify(newRecipe)
+      })
+      if (!response.ok) throw new Error('Eroare la salvare')
+      return true 
+    } catch (err) {
+      error.value = err.message
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function deleteRecipe(id) {
+    loading.value = true
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${userStore.token}`
+        }
+      })
+
+      if (!response.ok) throw new Error('Eroare la ștergere')
+      recipes.value = recipes.value.filter(r => r.id !== id)
+    } catch (err) {
+      error.value = err.message
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function updateRecipe(id, updatedData) {
+    loading.value = true;
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userStore.token}`
+        },
+        body: JSON.stringify(updatedData)
+      });
+
+      if (!response.ok) throw new Error('Eroare la actualizare');
+    
+      const index = recipes.value.findIndex(r => r.id === id);
+      if (index !== -1) {
+        recipes.value[index] = { ...recipes.value[index], ...updatedData };
+      }
+
+      return true;
+    } catch (err) {
+      error.value = err.message;
+      return false;
+    } finally {
+      loading.value = false;
+    }
+}
+
+  return { 
+    recipes, 
+    currentRecipe, 
+    loading, 
+    error, 
+    getAllRecipes,   
+    getMyRecipes,   
+    fetchRecipeById, 
+    addRecipe, 
+    deleteRecipe ,
+    updateRecipe
+  }
 })

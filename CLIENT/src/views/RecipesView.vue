@@ -1,15 +1,15 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import { useRecipeStore } from '../stores/recipeStore'
-import RecipeCard from '../components/RecipeCard.vue'
-import RecipeDetailsDialog from '../components/RecipeDetailsDialog.vue'
+import { useRecipeStore } from '@/stores/recipeStore' 
+import RecipeCard from '@/components/RecipeCard.vue'
+import RecipeDetailsDialog from '@/components/RecipeDetailsDialog.vue'
 
 const store = useRecipeStore()
 const isDialogOpen = ref(false)
 const selectedRecipe = ref(null)
 
 onMounted(() => {
-  store.fetchRecipes()
+  store.getAllRecipes();
 })
 
 const openDetails = (recipe) => {
@@ -30,12 +30,26 @@ const openDetails = (recipe) => {
     </div>
 
     <div v-else>
+      
       <RecipeCard 
         v-for="item in store.recipes"
         :key="item.id"
         :recipe="item" 
         @click="openDetails(item)" 
-      />
+      >
+        <template #actions>
+           <v-btn 
+             color="purple-lighten-4" 
+             variant="flat" 
+             class="text-purple-darken-2 font-weight-bold" 
+             append-icon="mdi-arrow-right"
+             @click.stop="openDetails(item)"
+           >
+             Vezi Detalii
+           </v-btn>
+        </template>
+
+      </RecipeCard>
     </div>
 
     <RecipeDetailsDialog 

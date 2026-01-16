@@ -1,8 +1,11 @@
 <script setup>
 import { formatTotalTime, getDifficultyColor } from '@/utils/formatters';
+
 defineProps({ 
   recipe: { type: Object, required: true } 
 })
+
+defineEmits(['click']);
 </script>
 
 <template>
@@ -45,14 +48,7 @@ defineProps({
       </v-col>
 
       <v-col cols="12" md="3" class="text-right pr-2">
-        <v-btn 
-          color="purple-lighten-4" 
-          variant="flat" 
-          class="text-purple-darken-2 font-weight-bold"
-          append-icon="mdi-arrow-right"
-        >
-          Vezi Detalii
-        </v-btn>
+        <slot name="actions"></slot> 
       </v-col>
 
     </v-row>
