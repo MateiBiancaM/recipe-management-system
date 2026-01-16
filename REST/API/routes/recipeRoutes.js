@@ -4,6 +4,7 @@ const recipeController = require('../controllers/recipeController');
 const checkAuth = require('../middleware/checkAuth');
 
 router.get('/', recipeController.getAllRecipes);
+router.get('/my-recipes', checkAuth, recipeController.getMyRecipes);
 router.get('/:id', recipeController.getRecipeById);
 
 router.post('/', checkAuth, recipeController.createRecipe);
