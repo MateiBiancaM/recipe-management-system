@@ -1,10 +1,11 @@
 const { admin } = require('../db');
-
+const { logInfo, logWarn, logError } = require('../utils/logger');
 const checkAuth = async (req, res, next) => {
   try {
     const tokenHeader = req.headers.authorization;//preluam token-ul din header
 
     if (!tokenHeader) {
+      logWarn('AUTH', 'Lipsă header sau format greșit');
       return res.status(401).json({ message: 'Autentificarea este necesară ' });
     }
 
@@ -14,7 +15,7 @@ const checkAuth = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error('Eroare autentificare:', error);
+    logError('AUTH', `Token invalid: ${error.message}`);
     return res.status(403).json({ message: 'Token invalid sau expirat' });
   }
 };
