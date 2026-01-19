@@ -37,11 +37,20 @@ onMounted(() => {
       <h1 class="text-h4 text-purple font-weight-bold">Rețetele Mele</h1>
       
       <v-btn 
+        class="d-none d-md-flex"
         color="purple-darken-2" 
         prepend-icon="mdi-plus"
         to="/add-recipe"
       >
         Adaugă Rețetă
+      </v-btn>
+
+      <v-btn 
+        class="d-md-none"
+        color="purple-darken-2" 
+        icon="mdi-plus"
+        to="/add-recipe"
+      >
       </v-btn>
     </div>
 

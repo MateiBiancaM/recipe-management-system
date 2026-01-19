@@ -90,20 +90,20 @@ const hasError = (keyword) => errorMessages.value.some(msg => msg.includes(keywo
         <div class="text-subtitle-2 mb-1">Descriere <span class="text-red">*</span></div>
         <v-textarea v-model="recipe.description" v-bind="fieldProps" rows="2" class="mb-3" :error="hasError('Descrierea')"></v-textarea>
 
-        <v-row>
-          <v-col cols="3">
+        <v-row dense>
+          <v-col cols="6" sm="3">
             <div class="text-subtitle-2 mb-1">Dificultate</div>
             <v-select v-model="recipe.details.difficulty" :items="DIFFICULTY_LEVELS" v-bind="fieldProps"></v-select>
           </v-col>
-          <v-col cols="3">
+          <v-col cols="6" sm="3">
             <div class="text-subtitle-2 mb-1">Porții</div>
             <v-text-field v-model.number="recipe.details.servings" type="number" min="1" v-bind="fieldProps"></v-text-field>
           </v-col>
-          <v-col cols="3">
+          <v-col cols="6" sm="3">
             <div class="text-subtitle-2 mb-1">Prep (min)</div>
             <v-text-field v-model.number="recipe.details.time.prep" type="number" min="0" v-bind="fieldProps"></v-text-field>
           </v-col>
-          <v-col cols="3">
+          <v-col cols="6" sm="3">
             <div class="text-subtitle-2 mb-1">Gătit (min)</div>
             <v-text-field v-model.number="recipe.details.time.cook" type="number" min="0" v-bind="fieldProps"></v-text-field>
           </v-col>
@@ -115,11 +115,25 @@ const hasError = (keyword) => errorMessages.value.some(msg => msg.includes(keywo
           <h4 class="text-subtitle-1">Ingrediente</h4>
           <v-btn size="x-small" color="green" variant="tonal" @click="addIngredient">+ Adaugă</v-btn>
         </div>
-        <div v-for="(item, index) in recipe.ingredients" :key="index" class="d-flex align-center mb-2 gap-2">
-          <v-text-field v-model="item.name" placeholder="Ingredient" class="flex-grow-1" v-bind="fieldProps"></v-text-field>
-          <v-text-field v-model="item.quantity" placeholder="Cant." style="max-width: 80px;" v-bind="fieldProps"></v-text-field>
-          <v-text-field v-model="item.unit" placeholder="Unit." style="max-width: 80px;" v-bind="fieldProps"></v-text-field>
-          <v-btn icon="mdi-delete" size="x-small" color="red" variant="text" @click="removeIngredient(index)"></v-btn>
+
+        <div v-for="(item, index) in recipe.ingredients" :key="index" class="mb-3 bg-grey-lighten-5 pa-2 rounded">
+          <v-row dense align="center">
+            <v-col cols="12" sm="6">
+               <v-text-field v-model="item.name" placeholder="Ingredient" hide-details density="compact" variant="outlined"></v-text-field>
+            </v-col>
+            
+            <v-col cols="5" sm="2">
+              <v-text-field v-model="item.quantity" placeholder="Cant." hide-details density="compact" variant="outlined"></v-text-field>
+            </v-col>
+
+            <v-col cols="5" sm="3">
+              <v-text-field v-model="item.unit" placeholder="Unit." hide-details density="compact" variant="outlined"></v-text-field>
+            </v-col>
+
+            <v-col cols="2" sm="1" class="d-flex justify-center">
+              <v-btn icon="mdi-delete" size="small" color="red" variant="text" @click="removeIngredient(index)"></v-btn>
+            </v-col>
+          </v-row>
         </div>
       </v-card>
 
@@ -129,13 +143,13 @@ const hasError = (keyword) => errorMessages.value.some(msg => msg.includes(keywo
           <v-btn size="x-small" color="green" variant="tonal" @click="addStep">+ Adaugă</v-btn>
         </div>
         <div v-for="(step, index) in recipe.steps" :key="index" class="d-flex align-start mb-2">
-          <span class="mr-2 mt-2 font-weight-bold">{{ index + 1 }}.</span>
+          <span class="mr-2 mt-2 font-weight-bold text-grey-darken-1">{{ index + 1 }}.</span>
           <v-textarea v-model="step.instruction" rows="1" auto-grow class="flex-grow-1" v-bind="fieldProps"></v-textarea>
           <v-btn icon="mdi-delete" size="x-small" color="red" variant="text" class="mt-1" @click="removeStep(index)"></v-btn>
         </div>
       </v-card>
 
-      <v-btn color="purple-darken-2" block size="large" type="submit" :loading="isLoading">
+      <v-btn color="purple-darken-2" block size="large" type="submit" :loading="isLoading" class="mb-5">
         {{ buttonLabel }}
       </v-btn>
     </v-form>

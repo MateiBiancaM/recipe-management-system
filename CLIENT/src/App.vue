@@ -40,8 +40,12 @@
   <v-app>
     <v-app-bar color="purple-lighten-4" elevation="2">
       <v-app-bar-title>
-        <v-icon icon="mdi-chef-hat" start></v-icon>
-        Rețetar Digital
+        <div class="d-flex align-center">
+          <v-icon icon="mdi-chef-hat" class="mr-2"></v-icon>
+            <span class="d-none d-md-block font-weight-bold">
+              Rețetar Digital
+            </span>
+        </div>
       </v-app-bar-title>
       <v-spacer></v-spacer>
       <div>
