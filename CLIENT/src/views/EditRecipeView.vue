@@ -25,13 +25,22 @@ onMounted(async () => {
 });
 
 async function handleUpdate(validData) {
-  const success = await recipeStore.updateRecipe(recipeId, validData);
-
-  if (success) {
-    snackbar.showSuccess("Rețeta a fost actualizată cu succes!");
-    router.push('/my-recipes');
-  } else {
-    snackbar.showError("Eroare la actualizare: " + recipeStore.error);
+  try {
+    if (validData.rawImageFile) {
+      const imageUrl = await recipeStore.uploadImage(validData.rawImageFile);
+      validData.imageUrl = imageUrl;
+    }
+    delete validData.rawImageFile;
+    const success = await recipeStore.updateRecipe(recipeId, validData);
+    if (success) {
+      snackbar.showSuccess("Rețeta a fost actualizată cu succes!");
+      router.push('/my-recipes');
+    } else {
+      throw new Error(recipeStore.error);
+    }
+  } catch (err) {
+    console.error(err);
+    snackbar.showError("Eroare la actualizare: " + err.message);
   }
 }
 </script>

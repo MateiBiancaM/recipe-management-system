@@ -17,7 +17,9 @@ app.use(cors());
 app.use(express.json()); 
 
 const recipeRoutes = require('./routes/recipeRoutes');  
+const uploadRoutes = require('./routes/uploadRoutes');
 app.use('/recipes', recipeRoutes);   
+app.use('/upload', uploadRoutes);
 
 app.listen(PORT, () => {
     logSuccess('SERVER', `Serverul rulează pe portul  http://localhost:${PORT}`);

@@ -21,7 +21,19 @@ defineEmits(['click']);
       <v-col cols="12" md="5">
         <div class="d-flex align-center pl-2">
           <v-avatar color="purple-lighten-5" size="50" class="mr-4">
-            <v-icon color="purple-darken-2" icon="mdi-silverware-fork-knife"></v-icon>
+            
+            <v-img 
+              v-if="recipe.imageUrl" 
+              :src="recipe.imageUrl" 
+              cover
+            ></v-img>
+
+            <v-icon 
+              v-else 
+              color="purple-darken-2" 
+              icon="mdi-silverware-fork-knife"
+            ></v-icon>
+
           </v-avatar>
           <h3 class="text-h6 font-weight-bold">{{ recipe.title }}</h3>
         </div>

@@ -81,7 +81,21 @@ defineEmits(['update:modelValue'])
             Poftă bună!
           </h2>
         </div>
-
+        <div v-if="recipe.imageUrl" class="d-flex justify-center pb-8 px-6">
+          <v-img
+            :src="recipe.imageUrl"
+            max-width="400"
+            max-height="300"
+            cover
+            class="rounded-xl elevation-4 border"
+          >
+              <template v-slot:placeholder>
+                <div class="d-flex align-center justify-center fill-height bg-grey-lighten-4">
+                    <v-progress-circular indeterminate color="purple-lighten-2"></v-progress-circular>
+                </div>
+              </template>
+          </v-img>
+        </div>
       </v-card-text>
     </v-card>
   </v-dialog>

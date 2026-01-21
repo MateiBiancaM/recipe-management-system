@@ -13,6 +13,7 @@ const emit = defineEmits(['submit']);
 
 const { errors: errorMessages, validate } = useRecipeValidator();
 const showError = ref(false);
+const imageFile = ref(null);
 
 const recipe = ref({
   title: '',
@@ -65,8 +66,17 @@ function submitForm() {
   
   recipe.value.ingredients = result.cleanIngredients;
   recipe.value.steps = result.cleanSteps;
+
+  const fileToUpload = imageFile.value 
+    ? (Array.isArray(imageFile.value) ? imageFile.value[0] : imageFile.value) 
+    : null;
   
-  emit('submit', recipe.value);
+  const finalPayload = {
+    ...recipe.value,
+    rawImageFile: fileToUpload
+  };
+
+  emit('submit', finalPayload);
 }
 
 const fieldProps = { variant: 'outlined', density: 'compact', hideDetails: true };
@@ -86,6 +96,30 @@ const hasError = (keyword) => errorMessages.value.some(msg => msg.includes(keywo
       <v-card class="mb-3 pa-3" elevation="2">
         <div class="text-subtitle-2 mb-1">Titlu <span class="text-red">*</span></div>
         <v-text-field v-model="recipe.title" v-bind="fieldProps" class="mb-3" :error="hasError('Titlul')"></v-text-field>
+
+        <div class="text-subtitle-2 mb-1">Poză Rețetă</div>
+        <div v-if="recipe.imageUrl && !imageFile" class="mb-3 position-relative d-inline-block">
+          <v-img 
+            :src="recipe.imageUrl" 
+            width="150" 
+            height="150" 
+            cover 
+            class="rounded elevation-2"
+          ></v-img>
+        <div class="text-caption text-grey mt-1">Imagine curentă</div>
+        </div>
+        <v-file-input
+          v-model="imageFile"
+          accept="image/*"
+          placeholder="Alege o imagine..."
+          prepend-icon=""
+          prepend-inner-icon="mdi-camera"
+          variant="outlined"
+          density="compact"
+          class="mb-3"
+          show-size
+          clearable
+        ></v-file-input>  
 
         <div class="text-subtitle-2 mb-1">Descriere <span class="text-red">*</span></div>
         <v-textarea v-model="recipe.description" v-bind="fieldProps" rows="2" class="mb-3" :error="hasError('Descrierea')"></v-textarea>

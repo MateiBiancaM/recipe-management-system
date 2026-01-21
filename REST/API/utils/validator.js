@@ -38,6 +38,7 @@ export const validateAndPrepareData = (data) => {
     return {
         title: data.title.trim(), 
         description: data.description.trim(),
+        imageUrl: (data.imageUrl && typeof data.imageUrl === 'string') ? data.imageUrl : null,
         details: {
             difficulty: ["Ușor", "Mediu", "Greu"].includes(data.details?.difficulty) ? data.details.difficulty : "Ușor",
             servings: Number(data.details?.servings) || 2, 

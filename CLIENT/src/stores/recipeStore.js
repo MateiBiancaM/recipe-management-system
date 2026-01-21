@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useUserStore } from './user'
+import { auth } from '@/firebase'
 
 export const useRecipeStore = defineStore('recipes', () => {
   const recipes = ref([])
@@ -139,7 +140,30 @@ export const useRecipeStore = defineStore('recipes', () => {
     } finally {
       loading.value = false;
     }
-}
+  }
+
+  async function uploadImage(file) {
+    const formData = new FormData()
+    formData.append('image', file)
+    const freshToken = await auth.currentUser?.getIdToken(true);
+    if (!freshToken) {
+        throw new Error("Utilizatorul nu este autentificat.");
+    }
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/upload`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${freshToken}`
+      },
+      body: formData
+    })
+
+    if (!response.ok) {
+      throw new Error('Eroare la upload imagine')
+    }
+
+    const data = await response.json()
+    return data.imageUrl
+  }
 
   return { 
     recipes, 
@@ -151,6 +175,7 @@ export const useRecipeStore = defineStore('recipes', () => {
     fetchRecipeById, 
     addRecipe, 
     deleteRecipe ,
-    updateRecipe
+    updateRecipe,
+    uploadImage
   }
 })

@@ -1,8 +1,9 @@
-const { db } = require('../db'); 
+const { db, bucket } = require('../db'); 
 const recipesCollection = db.collection('recipes');
 const { logSuccess, logWarn, logError } = require('../utils/logger');
 const { validateAndPrepareData } = require('../utils/validator'); 
 const { handleControllerError } = require('../utils/errorHandler');
+const { getFileNameFromUrl } = require('../utils/fileHelpers');
 
 //get all
 exports.getAllRecipes = async (req, res) => {
@@ -92,6 +93,22 @@ exports.updateRecipe = async (req, res) => {
             ...cleanData,
             updatedAt: new Date().toISOString()
         };
+        
+        if (req.body.imageUrl) {
+            updateData.imageUrl = req.body.imageUrl;
+            const oldImageUrl = doc.data().imageUrl;
+            if (oldImageUrl) {
+                const oldFileName = getFileNameFromUrl(oldImageUrl);
+                if (oldFileName) {
+                    try {
+                        await bucket.file(oldFileName).delete();
+                        logSuccess('Storage', `Ștersă imaginea veche (Update): ${oldFileName}`);
+                    } catch (err) {
+                        logWarn('Storage', `Nu s-a putut șterge imaginea veche (Update): ${oldFileName}`);
+                    }
+                }
+            }
+        }    
 
         await docRef.update(updateData);
         logSuccess('UPDATE', `Actualizat rețeta: "${cleanData.title}"`);
@@ -117,6 +134,17 @@ exports.deleteRecipe = async (req, res) => {
             return res.status(403).send('Nu ai permisiunea să ștergi această rețetă!');
         }
 
+        if (recipeData.imageUrl) {
+            const fileName = getFileNameFromUrl(recipeData.imageUrl);
+            if (fileName) {
+                try {
+                    await bucket.file(fileName).delete();
+                    logSuccess('Storage', `Ștersă imaginea asociată: ${fileName}`);
+                } catch (imgError) {
+                    logWarn('Storage', `Nu s-a putut șterge imaginea: ${fileName}`);
+                }
+            }
+        }
         await docRef.delete();
         logSuccess('DELETE', `Șters rețeta cu ID: ${req.params.id}`);
         res.status(200).send('Rețeta a fost ștearsă cu succes');
