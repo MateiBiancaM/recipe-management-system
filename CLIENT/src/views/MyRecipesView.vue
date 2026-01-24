@@ -1,6 +1,7 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useRecipeStore } from '@/stores/recipeStore' 
+import { useRecipeSorter } from '@/composables/useRecipeSorter'
 import RecipeCard from '@/components/RecipeCard.vue'
 
 const store = useRecipeStore()
@@ -8,6 +9,15 @@ const store = useRecipeStore()
 const showDeleteDialog = ref(false)
 const recipeToDelete = ref(null)
 const isDeleting = ref(false)
+const { searchQuery, paginateRecipes, loadMore, hasMore } = useRecipeSorter(computed(() => store.recipes));
+
+const onIntersect = (isIntersecting) => {
+  if (isIntersecting && hasMore.value) {
+    setTimeout(() => {
+      loadMore();
+    }, 300); 
+  }
+}
 
 const openDeleteModal = (id) => {
   recipeToDelete.value = id
@@ -33,25 +43,38 @@ onMounted(() => {
 <template>
   <v-container fluid class="pa-4 pa-md-8">
     
-    <div class="d-flex justify-space-between align-center mb-6 ml-2">
-      <h1 class="text-h4 text-purple font-weight-bold">Rețetele Mele</h1>
-      
-      <v-btn 
-        class="d-none d-md-flex"
-        color="purple-darken-2" 
-        prepend-icon="mdi-plus"
-        to="/add-recipe"
-      >
-        Adaugă Rețetă
-      </v-btn>
+    <div class="mb-6 ml-2">
+      <v-row align="center">
+        
+        <v-col cols="12" md="3">
+          <h1 class="text-h4 text-purple font-weight-bold">Rețetele Mele</h1>
+        </v-col>
 
-      <v-btn 
-        class="d-md-none"
-        color="purple-darken-2" 
-        icon="mdi-plus"
-        to="/add-recipe"
-      >
-      </v-btn>
+        <v-col cols="12" md="6">
+          <v-text-field
+            v-model="searchQuery"
+            label="Caută în rețetele tale..."
+            prepend-inner-icon="mdi-magnify"
+            variant="outlined" 
+            density="compact"
+            hide-details
+            clearable
+            bg-color="white"
+          ></v-text-field>
+        </v-col>
+
+        <v-col cols="12" md="3" class="d-flex justify-md-end">
+          <v-btn 
+            color="purple-darken-2" 
+            prepend-icon="mdi-plus"
+            to="/add-recipe"
+            class="w-100 w-md-auto"
+            height="40"
+          >
+            Adaugă Rețetă
+          </v-btn>
+        </v-col>
+      </v-row>
     </div>
 
     <div v-if="store.loading && !showDeleteDialog" class="text-center mt-10">
@@ -64,7 +87,7 @@ onMounted(() => {
       </div>
 
       <RecipeCard 
-        v-for="item in store.recipes" 
+        v-for="item in paginateRecipes" 
         :key="item.id"
         :recipe="item"
       >
@@ -85,6 +108,19 @@ onMounted(() => {
         </template>
 
       </RecipeCard>
+      <div 
+        v-if="hasMore" 
+        v-intersect="onIntersect" 
+        class="text-center py-6"
+      >
+        <v-progress-circular indeterminate color="purple-lighten-3" size="40"></v-progress-circular>
+      </div>
+      <div v-if="paginateRecipes.length === 0 && store.recipes.length > 0" class="text-center mt-10 text-grey-darken-1">
+        <h3>Nu am găsit rețete pentru "<strong>{{ searchQuery }}</strong>"</h3>
+      </div>
+      <div v-if="!hasMore && paginateRecipes.length > 0" class="text-center mt-4 text-grey-lighten-1 text-caption">
+         Acestea sunt toate rețetele tale
+      </div>
     </div>
 
     <v-dialog v-model="showDeleteDialog" max-width="400">

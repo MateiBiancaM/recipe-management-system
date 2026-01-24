@@ -1,9 +1,11 @@
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 export function useRecipeSorter(recipesSource) {
   const sortBy = ref('default');
   const searchQuery = ref('');
   const searchBy = ref('title'); 
+  const itemsPerPage = 12; 
+  const displayedCount = ref(itemsPerPage);
 
   const getDifficultyScore = (text) => {
     if (!text) return 2;
@@ -70,10 +72,25 @@ export function useRecipeSorter(recipesSource) {
     });
   });
 
+  const paginateRecipes = computed(() => {
+    return filteredAndSortedRecipes.value.slice(0, displayedCount.value);
+  });
+  const loadMore = () => {
+      if (displayedCount.value < filteredAndSortedRecipes.value.length) {
+      displayedCount.value += itemsPerPage;
+    }
+  };
+  const hasMore = computed(() => displayedCount.value < filteredAndSortedRecipes.value.length);
+  watch([sortBy, searchQuery, searchBy], () => {
+    displayedCount.value = itemsPerPage;
+  });
+
   return {
     sortBy,
     searchQuery,
     searchBy, 
-    filteredAndSortedRecipes
+    paginateRecipes,
+    loadMore,
+    hasMore,
   };
 }

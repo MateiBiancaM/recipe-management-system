@@ -123,13 +123,14 @@ exports.deleteRecipe = async (req, res) => {
     try {
         const docRef = recipesCollection.doc(req.params.id);
         const doc = await docRef.get();
+        const recipeData = doc.data();
 
         if (!doc.exists) {
             logWarn('DELETE', `ID inexistent: ${req.params.id}`);
             return res.status(404).send('Rețeta nu a fost găsită');
         }
 
-        if (doc.data().userId !== req.user.uid) {
+        if (recipeData.userId !== req.user.uid) {
             logWarn('DELETE SECURITY', `Tentativă ștergere neautorizată.`);
             return res.status(403).send('Nu ai permisiunea să ștergi această rețetă!');
         }

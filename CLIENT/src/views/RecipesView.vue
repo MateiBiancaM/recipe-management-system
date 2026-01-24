@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, computed } from 'vue'
-import { useRecipeStore } from '@/stores/recipeStore' 
+import { useRecipeStore } from '@/stores/recipeStore'
 import { useRecipeSorter } from '@/composables/useRecipeSorter'
 import RecipeCard from '@/components/RecipeCard.vue'
 import RecipeDetailsDialog from '@/components/RecipeDetailsDialog.vue'
@@ -8,7 +8,7 @@ import RecipeDetailsDialog from '@/components/RecipeDetailsDialog.vue'
 const store = useRecipeStore()
 const isDialogOpen = ref(false)
 const selectedRecipe = ref(null)
-const { sortBy, searchQuery, searchBy, filteredAndSortedRecipes } = useRecipeSorter(computed(() => store.recipes));
+const { sortBy, searchQuery, searchBy, paginateRecipes, loadMore, hasMore } = useRecipeSorter(computed(() => store.recipes));
 
 onMounted(() => {
   store.getAllRecipes();
@@ -18,11 +18,19 @@ const openDetails = (recipe) => {
   selectedRecipe.value = recipe
   isDialogOpen.value = true
 }
+
+const onIntersect = (isIntersecting) => {
+  if (isIntersecting && hasMore.value) {
+    setTimeout(() => {
+      loadMore();
+    }, 300);
+  }
+}
 </script>
 
 <template>
   <v-container fluid class="pa-4 pa-md-8">
-    
+
     <div class="mb-6 ml-2">
       <v-row align="center" class="mb-6">
 
@@ -92,7 +100,7 @@ const openDetails = (recipe) => {
     <div v-else>
 
       <RecipeCard 
-        v-for="item in filteredAndSortedRecipes" 
+        v-for="item in paginateRecipes"
         :key="item.id"
         :recipe="item" 
         @click="openDetails(item)" 
@@ -110,8 +118,18 @@ const openDetails = (recipe) => {
         </template>
 
       </RecipeCard>
-      <div v-if="filteredAndSortedRecipes.length === 0 && store.recipes.length > 0" class="text-center mt-10 text-grey-darken-1">
+      <div
+        v-if="hasMore"
+        v-intersect="onIntersect"
+        class="text-center py-6"
+      >
+        <v-progress-circular indeterminate color="purple-lighten-3" size="40"></v-progress-circular>
+      </div>
+      <div v-if="paginateRecipes.length === 0 && store.recipes.length > 0" class="text-center mt-10 text-grey-darken-1">
         <h3>Nu am găsit rețete cu {{ searchBy === 'title' ? 'titlul' : 'ingredientul' }} "<strong>{{ searchQuery }}</strong>"</h3>
+      </div>
+      <div v-if="!hasMore && paginateRecipes.length > 0" class="text-center mt-4 text-grey-lighten-1 text-caption">
+         Acestea sunt toate rețetele.
     </div>
     </div> 
 
