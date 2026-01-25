@@ -3,12 +3,16 @@ import { useRecipeStore } from '@/stores/recipeStore';
 import { useRouter } from 'vue-router';
 import { useSnackbarStore } from '@/stores/snackbar';
 import RecipeForm from '@/components/RecipeForm.vue'; 
+import { ref } from 'vue';
 
 const recipeStore = useRecipeStore();
 const router = useRouter();
 const snackbar = useSnackbarStore();
+const isSubmitting = ref(false);
+
 
 async function handleCreate(validData) {
+  isSubmitting.value = true;
   try {
     if (validData.rawImageFile) {
       const imageUrl = await recipeStore.uploadImage(validData.rawImageFile);
@@ -25,6 +29,8 @@ async function handleCreate(validData) {
   } catch (err) {
     console.error(err);
     snackbar.showError("Nu am putut salva rețeta: " + err.message);
+  } finally {
+    isSubmitting.value = false;
   }
 }
 </script>
@@ -35,7 +41,7 @@ async function handleCreate(validData) {
     
     <RecipeForm 
       button-label="Salvează Rețeta"
-      :is-loading="recipeStore.loading"
+      :is-loading="isSubmitting"
       @submit="handleCreate"
     />
   </v-container>

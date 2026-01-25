@@ -12,6 +12,7 @@ const snackbar = useSnackbarStore();
 const recipeId = route.params.id;
 const isLoadingData = ref(true);
 const existingRecipe = ref(null);
+const isSubmitting = ref(false);
 
 onMounted(async () => {
   await recipeStore.fetchRecipeById(recipeId);
@@ -25,6 +26,7 @@ onMounted(async () => {
 });
 
 async function handleUpdate(validData) {
+  isSubmitting.value = true;
   try {
     if (validData.rawImageFile) {
       const imageUrl = await recipeStore.uploadImage(validData.rawImageFile);
@@ -41,6 +43,8 @@ async function handleUpdate(validData) {
   } catch (err) {
     console.error(err);
     snackbar.showError("Eroare la actualizare: " + err.message);
+  } finally {
+    isSubmitting.value = false;
   }
 }
 </script>
@@ -57,7 +61,7 @@ async function handleUpdate(validData) {
       v-else
       :initial-data="existingRecipe"
       button-label="Actualizează Rețeta"
-      :is-loading="recipeStore.loading"
+      :is-loading="isSubmitting"
       @submit="handleUpdate"
     />
   </v-container>
