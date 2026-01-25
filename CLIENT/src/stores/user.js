@@ -30,7 +30,6 @@ export const useUserStore = defineStore('user', () => {
       await signOut(auth)
       user.value = null
       token.value = null
-      console.log("Delogare reușită")
       router.push('/login')
     } catch (error) {
       console.error("Eroare la delogare:", error)

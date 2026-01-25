@@ -1,10 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import RecipesView from '../views/RecipesView.vue'
-import LoginView from '../views/LoginView.vue'
-import MyRecipesView from '../views/MyRecipesView.vue'
-import AddRecipeView from '@/views/AddRecipeView.vue'
-import EditRecipeView from '../views/EditRecipeView.vue'
 import { auth } from '@/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 
@@ -20,30 +15,30 @@ const router = createRouter({
     {
       path: '/recipes',
       name: 'recipes',
-      component: RecipesView
+      component: () => import('../views/RecipesView.vue')
     },
     {
       path: '/login',
       name: 'login',
-      component: LoginView,
+      component: () => import('../views/LoginView.vue'),
       meta: { guestOnly: true }
     },
     {
       path: '/my-recipes',
       name: 'my-recipes',
-      component: MyRecipesView,
+      component: () => import('../views/MyRecipesView.vue'),
       meta: { requiresAuth: true }
     },
     {
       path: '/add-recipe',
       name: 'add-recipe',
-      component: AddRecipeView,
+      component: () => import('@/views/AddRecipeView.vue'),
       meta: { requiresAuth: true }
     },
     {
       path: '/edit-recipe/:id',
       name: 'edit-recipe',
-      component: EditRecipeView,
+      component: () => import('../views/EditRecipeView.vue'),
       meta: { requiresAuth: true }
     }
   ]

@@ -2,11 +2,13 @@ const { logSuccess, logInfo } = require('./utils/logger');
 const express = require('express'); 
 const cors = require('cors'); 
 const morgan = require('morgan');
+const compression = require('compression');
 require('dotenv').config();
 
 const app = express(); 
 const PORT = process.env.PORT || 8080; 
 
+app.use(compression());
 app.use(morgan('dev'));
 app.use((req, res, next) => {
     logInfo('REQUEST', `${req.method} ${req.url}`);
